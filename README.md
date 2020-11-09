@@ -1,3 +1,5 @@
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Soliton-Analytics-Team/Covid_19_Tokyo_collection/blob/master/Covid_19_Tokyo_collection.ipynb)
+
 # 東京都のページのPDFファイルから市区町村別の新型コロナ感染者数を抽出してみた
 
 データ解析の初手はデータの収集です。この記事では具体的なデータの収集手段をひとつ提示します。
