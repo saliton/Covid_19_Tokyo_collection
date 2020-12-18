@@ -7,7 +7,7 @@
 昨今（2020年8月現在）の新型コロナウィルスの流行により、東京都の感染者数が市区町村別に毎日発表されています。都道府県別の感染者数は報道もされますが、東京都の市区町村別の集計はこの発表でしかお目にかかれません。そこで、この情報を取得して加工可能なデータとして抽出します。感染者数はPDFファイルとして提示されているので、PDFファイルからデータを取り出します。
 
 
-```
+```Python
 from urllib import request
 from bs4 import BeautifulSoup
 
@@ -21,7 +21,7 @@ with request.urlopen(url_base + 'index.html') as response:
 このページの配下のページで「患者の発生」が含まれるリンクの先のページに感染者数が載っています。最初のリンクを表示してみましょう。
 
 
-```
+```Python
 import os.path
 
 for base_link in soup.select('a'):
@@ -43,7 +43,7 @@ for base_link in soup.select('a'):
 このリンク先のページを取得してみます。
 
 
-```
+```Python
 with request.urlopen(url_base + page_link) as response:
     page = BeautifulSoup(response)
 ```
@@ -51,7 +51,7 @@ with request.urlopen(url_base + page_link) as response:
 このページのリリース日時が\<div class="releasedate"\>の中の\<p\>に書いてあります。
 
 
-```
+```Python
 release = page.select_one('div[class=releasedate]').select_one('p').text
 print(release)
 ```
@@ -67,7 +67,7 @@ print(release)
 ```
 
 
-```
+```Python
 from parse import parse
 from datetime import datetime
 
@@ -84,7 +84,7 @@ print(release_date)
 リンク先がPDFファイルのリンクを探します。
 
 
-```
+```Python
 import os
 
 for pdf_link in page.select('a'):
@@ -109,7 +109,7 @@ print(pdf_href)
 PDFファイルを読み込みます。複数のテーブルが読み込まれた場合、最後のテーブルが市区町村別感染者数です。
 
 
-```
+```Python
 from camelot import read_pdf
 from pprint import pprint
 tables = read_pdf(url_base + pdf_href)
@@ -197,7 +197,7 @@ pprint(table.data)
 うまく取れませんでした。どうやら文字間隔の調整が必要なようです。
 
 
-```
+```Python
 tables = read_pdf(url_base + pdf_href, layout_kwargs = { 'char_margin': 0.01 })
 table = tables[-1]
 pprint(table.data)
@@ -280,7 +280,7 @@ pprint(table.data)
 今度はうまく取れました。さらに、タイトルと数値が一行おきになっているので、それを勘案して読み込みます。また、括弧で囲われた数値は退院した人数なので、削除しましょう。
 
 
-```
+```Python
 import re
 for i in range(0, len(table.data), 2):
     for key, num in zip(table.data[i], table.data[i+1]):
@@ -359,7 +359,7 @@ for i in range(0, len(table.data), 2):
 実はこれで一件落着ではありません。5月18日の情報を取得してみましょう。
 
 
-```
+```Python
 tables = read_pdf('https://www.bousai.metro.tokyo.lg.jp/_res/projects/default_project/_page_/001/010/322/2020051801.pdf', layout_kwargs = { 'char_margin': 0.01 })
 table = tables[-1]
 pprint(table.data)
@@ -382,7 +382,7 @@ pprint(table.data)
 残念ながら東久留米と武蔵村山が一つになっています。これを分けようとしてchar_marginをもっと小さくすると他の文字列が1文字ずつに別れてしまいます。仕方がないので対症療法にしましょう。これが起こると直前の文字列が空になります。また4文字が連なる場合だけです。そこで、直前の文字列が空の場合に、現在の文字列を半分に分けた前半を直前の文字列に振り分けます。処理は以下になります。
 
 
-```
+```Python
 import re
 data = []
 for i in range(0, len(table.data), 2):
@@ -477,7 +477,7 @@ pprint(data)
 ```
 
 
-```
+```Python
 from urllib import request
 from bs4 import BeautifulSoup
 from camelot import read_pdf
@@ -707,7 +707,7 @@ for base_link in soup.select('a'):
 せっかくなので、結果を保存しておきましょう。Google Colabで左側のファイルメニューからGoogle Driveをマウントしてから、下記を実行してください。/content/drive/My Drive/coronavirus/tokyo.jsonに保存されます。
 
 
-```
+```Python
 import json
 %cd /content/drive/My\ Drive/coronavirus
 with open('tokyo.json', 'w') as fout:
@@ -720,7 +720,7 @@ with open('tokyo.json', 'w') as fout:
 最後にエクセルなどでcsvとして貼り付けるのに便利なようにソートして出力しておきます。
 
 
-```
+```Python
 print('Date', ','.join([item[0] for item in result[0][1]]), sep=',')
 for r in sorted(result):
     print(','.join([r[0].strftime('%Y/%m/%d')] + [str(item[1]) for item in r[1]]))
