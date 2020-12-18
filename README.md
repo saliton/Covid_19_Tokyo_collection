@@ -62,7 +62,7 @@ print(release)
 この文字列を解析するのにparseモジュールを使ってみましょう。
 
 
-```
+```Shell
 !pip install parse
 ```
 
@@ -101,7 +101,7 @@ print(pdf_href)
 このPDFファイルの中からテーブルを読むのにcamelotモジュールを使います。まず、必要なモジュールをインストールしましょう。
 
 
-```
+```Shell
 !pip install camelot-py
 !apt install ghostscript
 ```
@@ -471,7 +471,7 @@ pprint(data)
 
 
 
-```
+```Shell
 !pip install bs4 camelot-py parse
 !apt install ghostscript
 ```
