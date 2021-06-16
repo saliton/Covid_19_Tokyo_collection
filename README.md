@@ -7,7 +7,7 @@
 まず、「[東京都新型コロナウイルス感染症対策本部報](https://www.bousai.metro.tokyo.lg.jp/taisaku/saigai/1010035/index.html)」のページを取得してBeautifulSoupで解析します。
 
 
-```
+```python
 from urllib import request
 from bs4 import BeautifulSoup
 
@@ -19,7 +19,7 @@ with request.urlopen(url_base + 'index.html') as response:
 このページの配下のページで「患者の発生」が含まれるリンクの先のページに感染者数が載っています。最初のリンクを表示してみましょう。
 
 
-```
+```python
 import os.path
 
 for base_link in soup.select('a'):
@@ -41,7 +41,7 @@ for base_link in soup.select('a'):
 このリンク先のページを取得してみます。
 
 
-```
+```python
 with request.urlopen(url_base + page_link) as response:
     page = BeautifulSoup(response)
 ```
@@ -49,7 +49,7 @@ with request.urlopen(url_base + page_link) as response:
 このページのリリース日時が\<div class="releasedate"\>の中の\<p\>に書いてあります。
 
 
-```
+```python
 release = page.select_one('div[class=releasedate]').select_one('p').text
 print(release)
 ```
@@ -60,7 +60,7 @@ print(release)
 この文字列を解析するのにparseモジュールを使ってみましょう。
 
 
-```
+```shell
 !pip install parse
 ```
 
@@ -76,7 +76,7 @@ print(release)
 
 
 
-```
+```python
 from parse import parse
 from datetime import datetime
 
@@ -93,7 +93,7 @@ print(release_date)
 リンク先がPDFファイルのリンクを探します。
 
 
-```
+```python
 import os
 
 for pdf_link in page.select('a'):
@@ -110,7 +110,7 @@ print(pdf_href)
 このPDFファイルの中からテーブルを読むのにcamelotモジュールを使います。まず、必要なモジュールをインストールしましょう。
 
 
-```
+```shell
 !pip install camelot-py
 !apt install ghostscript
 ```
@@ -230,7 +230,7 @@ print(pdf_href)
 PDFファイルを読み込みます。複数のテーブルが読み込まれた場合、最後のテーブルが市区町村別感染者数です。
 
 
-```
+```python
 from camelot import read_pdf
 from pprint import pprint
 tables = read_pdf(url_base + pdf_href)
@@ -316,7 +316,7 @@ pprint(table.data)
 うまく取れませんでした。どうやら文字間隔の調整が必要なようです。
 
 
-```
+```python
 tables = read_pdf(url_base + pdf_href, layout_kwargs = { 'char_margin': 0.01 })
 table = tables[-1]
 pprint(table.data)
@@ -399,7 +399,7 @@ pprint(table.data)
 今度はうまく取れました。さらに、タイトルと数値が一行おきになっているので、それを勘案して読み込みます。また、括弧で囲われた数値は退院した人数なので、削除しましょう。
 
 
-```
+```python
 import re
 for i in range(0, len(table.data), 2):
     for key, num in zip(table.data[i], table.data[i+1]):
@@ -478,7 +478,7 @@ for i in range(0, len(table.data), 2):
 実はこれで一件落着ではありません。2020年5月18日の情報を取得してみましょう。
 
 
-```
+```python
 tables = read_pdf('https://www.bousai.metro.tokyo.lg.jp/_res/projects/default_project/_page_/001/010/322/2020051801.pdf', layout_kwargs = { 'char_margin': 0.01 })
 table = tables[-1]
 pprint(table.data)
@@ -501,7 +501,7 @@ pprint(table.data)
 残念ながら東久留米と武蔵村山が一つになっています。これを分けようとしてchar_marginをもっと小さくすると他の文字列が1文字ずつに別れてしまいます。仕方がないので対症療法にしましょう。これが起こると直前の文字列が空になります。また4文字が連なる場合だけです。そこで、直前の文字列が空の場合に、現在の文字列を半分に分けた前半を直前の文字列に振り分けます。処理は以下になります。
 
 
-```
+```python
 import re
 data = []
 for i in range(0, len(table.data), 2):
@@ -589,7 +589,7 @@ pprint(data)
 
 
 
-```
+```python
 from google.colab import drive
 drive.mount('/content/drive')
 !mkdir -p /content/drive/MyDrive/coronavirus
@@ -601,7 +601,7 @@ drive.mount('/content/drive')
 過去にデータ取得を行っていた場合、新規のデータのみを追加します。その場合の既存のデータの読み込みとその中の最新の日付を取得します。
 
 
-```
+```python
 import os
 import json
 import datetime
@@ -618,7 +618,7 @@ else:
 データ取得には時間がかかるので、今回は2021年5月1日以降のデータを取得してみます。
 
 
-```
+```shell
 !pip install bs4 camelot-py parse
 !apt install ghostscript
 ```
@@ -651,7 +651,7 @@ else:
 
 
 
-```
+```python
 from urllib import request
 from bs4 import BeautifulSoup
 from camelot import read_pdf
@@ -760,7 +760,7 @@ result = sorted(result)
 次を実行するとデータが/content/drive/MyDrive/coronavirus/tokyo.jsonに保存されます。
 
 
-```
+```python
 import json
 !mkdir -p /content/drive/MyDrive/coronavirus
 with open('/content/drive/MyDrive/coronavirus/tokyo.json', 'w') as fout:
@@ -770,7 +770,7 @@ with open('/content/drive/MyDrive/coronavirus/tokyo.json', 'w') as fout:
 最後にエクセルなどでcsvとして貼り付けるのに便利なように出力しておきます。
 
 
-```
+```python
 print('Date', ','.join([item[0] for item in result[0][1]]), sep=',')
 for r in result:
     print(','.join([r[0][:10].replace('-', '/')] + [str(item[1]) for item in r[1]]))
