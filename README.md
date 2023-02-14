@@ -1,4 +1,4 @@
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Soliton-Analytics-Team/Covid_19_Tokyo_collection/blob/master/Covid_19_Tokyo_collection.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/saliton/Covid_19_Tokyo_collection/blob/master/Covid_19_Tokyo_collection.ipynb)
 
 # 東京都のページのPDFファイルから市区町村別の新型コロナ感染者数を抽出してみた
 
